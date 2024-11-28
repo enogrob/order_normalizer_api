@@ -38,6 +38,7 @@ graph TD
 ```    
 
 This diagram shows the flow of data from the user uploading a file to the server processing it and interacting with the database, and finally returning a JSON response to the user. 
+This project adheres to SOLID principles, ensuring robustness, scalability, and maintainability.
 
 **Ruby version**
 - 3.3.6
@@ -52,6 +53,7 @@ brew install jq
 ```shell 
 git clone git@github.com:enogrob/order_normalizer_api.git
 cd order_normalize_api
+rails db:migrate
 bundle
 ```
 
