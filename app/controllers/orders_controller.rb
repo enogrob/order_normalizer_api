@@ -1,7 +1,12 @@
 class OrdersController < ApplicationController
   def upload
     file = params[:file]
-    render json: NormalizeFileService.process(file.path)
+    begin
+      result = NormalizeFileService.process(file)
+      render json: result
+    rescue InvalidFileFormatError => e
+      render json: { error: e.message }, status: :unprocessable_entity
+    end
   end
 
   def index
@@ -24,7 +29,7 @@ class OrdersController < ApplicationController
       total: "%.2f" % order.total,
       date: order.date,
       products: order.products.map do |product|
-      { product_id: product.product_id, value: "%.2f" % product.value }
+        { product_id: product.product_id, value: "%.2f" % product.value }
       end
     }
   end

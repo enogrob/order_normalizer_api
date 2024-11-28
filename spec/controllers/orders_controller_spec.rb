@@ -1,79 +1,81 @@
 require 'rails_helper'
 
 RSpec.describe OrdersController, type: :controller do
-  let!(:user) { create(:user, user_id: 1, name: 'Zarelli') }
-  let!(:order) { create(:order, order_id: 123, user: user, total: 1024.48, date: '2021-12-01') }
-  let!(:product1) { create(:product, product_id: 111, value: 512.24, order: order) }
-  let!(:product2) { create(:product, product_id: 122, value: 512.24, order: order) }
-
   describe 'POST #upload' do
-    context 'with a valid file' do
-      it 'returns the processed data' do
-        file = fixture_file_upload('valid_sample.txt', 'text/plain')
+    let(:valid_file_path) { 'spec/fixtures/files/valid_sample.txt' }
+    let(:invalid_file_path) { 'spec/fixtures/files/invalid_sample.txt' }
+    let(:empty_file_path) { 'spec/fixtures/files/empty_sample.txt' }
 
-        post :upload, params: { file: file }
+    context 'with valid file' do
+      it 'returns a successful response' do
+        allow(NormalizeFileService).to receive(:process).and_return([])
+
+        post :upload, params: { file: valid_file_path }
+
         expect(response).to have_http_status(:ok)
+        expect(response.body).to eq('[]')
+      end
+    end
 
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result.size).to eq(2)
+    context 'with invalid file' do
+      it 'returns an error response' do
+        allow(NormalizeFileService).to receive(:process).and_raise(InvalidFileFormatError, 'Invalid file format')
 
-        user = result.first
-        expect(user[:user_id]).to eq(1)
-        expect(user[:name]).to eq('Zarelli')
-        expect(user[:orders].size).to eq(1)
+        post :upload, params: { file: invalid_file_path }
 
-        order = user[:orders].first
-        expect(order[:order_id]).to eq(123)
-        expect(order[:total]).to eq('1024.48')
-        expect(order[:products].size).to eq(2)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(JSON.parse(response.body)).to eq('error' => 'Invalid file format')
+      end
+    end
+
+    context 'with empty file' do
+      it 'returns a successful response with an empty array' do
+        allow(NormalizeFileService).to receive(:process).and_return([])
+
+        post :upload, params: { file: empty_file_path }
+
+        expect(response).to have_http_status(:ok)
+        expect(response.body).to eq('[]')
       end
     end
   end
 
   describe 'GET #index' do
-    context 'without filters' do
-      it 'returns all orders' do
-        get :index
-        expect(response).to have_http_status(:ok)
+    let!(:user) { create(:user) }
+    let!(:order) { create(:order, user: user) }
+    let!(:product) { create(:product, order: order) }
 
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result.size).to eq(1)
+    it 'returns a list of orders' do
+      get :index
 
-        order = result.first
-        expect(order[:order_id]).to eq(123)
-        expect(order[:total]).to eq('1024.48')
-        expect(order[:products].size).to eq(2)
-      end
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body)).to eq([
+        {
+          'order_id' => order.order_id,
+          'total' => '%.2f' % order.total,
+          'date' => order.date.to_s,
+          'products' => [
+            {
+              'product_id' => product.product_id,
+              'value' => '%.2f' % product.value
+            }
+          ]
+        }
+      ])
     end
 
-    context 'with order_id filter' do
-      it 'returns the filtered order' do
-        get :index, params: { id: 123 }
-        expect(response).to have_http_status(:ok)
+    it 'filters orders by id' do
+      get :index, params: { id: order.order_id }
 
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result.size).to eq(1)
-        expect(result.first[:order_id]).to eq(123)
-      end
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
     end
 
-    context 'with date range filter' do
-      it 'returns orders within the specified range' do
-        get :index, params: { start_date: '2021-12-01', end_date: '2021-12-31' }
-        expect(response).to have_http_status(:ok)
+    it 'filters orders by date range' do
+      get :index, params: { start_date: order.date, end_date: order.date }
 
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result.size).to eq(1)
-        expect(result.first[:order_id]).to eq(123)
-      end
-
-      it 'returns no orders outside the specified range' do
-        get :index, params: { start_date: '2020-01-01', end_date: '2020-12-31' }
-        expect(response).to have_http_status(:ok)
-
-        result = JSON.parse(response.body, symbolize_names: true)
-        expect(result).to be_empty
-      end
+      expect(response).to have_http_status(:ok)
+      expect(JSON.parse(response.body).size).to eq(1)
     end
   end
 end

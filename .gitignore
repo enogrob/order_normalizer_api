@@ -33,5 +33,5 @@
 
 # Ignore data files and finder icons
 Icon*
-data_1.txt
-data_2.txt
+data_*
+

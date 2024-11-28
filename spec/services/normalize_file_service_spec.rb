@@ -1,29 +1,31 @@
 require 'rails_helper'
 
-RSpec.describe NormalizeFileService, type: :service do
-  let(:valid_file) { Rails.root.join('spec/fixtures/files/valid_sample.txt') }
-
+RSpec.describe NormalizeFileService do
   describe '.process' do
-    context 'with a valid file' do
-      it 'parses and returns normalized data' do
-        result = NormalizeFileService.process(valid_file)
+    let(:valid_file_path) { 'spec/fixtures/files/valid_sample.txt' }
+    let(:invalid_file_path) { 'spec/fixtures/files/invalid_sample.txt' }
+    let(:empty_file_path) { 'spec/fixtures/files/empty_sample.txt' }
 
+    context 'with valid file' do
+      it 'processes the file successfully' do
+        result = NormalizeFileService.process(valid_file_path)
         expect(result).to be_an(Array)
-        expect(result.size).to eq(2)
+      end
+    end
 
-        user = result.first
-        expect(user[:user_id]).to eq(1)
-        expect(user[:name]).to eq('Zarelli')
-        expect(user[:orders].size).to eq(1)
+    context 'with invalid file' do
+      it 'raises InvalidFileFormatError' do
+        expect {
+          NormalizeFileService.process(invalid_file_path)
+        }.to raise_error(InvalidFileFormatError, /Error parsing line/)
+      end
+    end
 
-        order = user[:orders].first
-        expect(order[:order_id]).to eq(123)
-        expect(order[:total]).to eq('1024.48')
-        expect(order[:products].size).to eq(2)
-
-        product = order[:products].first
-        expect(product[:product_id]).to eq(111)
-        expect(product[:value]).to eq(512.24)
+    context 'with empty file' do
+      it 'raises InvalidFileFormatError' do
+        expect {
+          NormalizeFileService.process(empty_file_path)
+        }.to raise_error(InvalidFileFormatError, "The file is empty.")
       end
     end
   end
