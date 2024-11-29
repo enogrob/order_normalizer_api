@@ -40,6 +40,33 @@ graph TD
 This diagram shows the flow of data from the user uploading a file to the server processing it and interacting with the database, and finally returning a JSON response to the user. 
 This project adheres to SOLID principles, ensuring robustness, scalability, and maintainability.
 
+# Components Diagram
+
+```mermaid
+graph TD
+    subgraph Components
+        A[OrdersController]
+        B[NormalizeFileService]
+    end
+
+    A --> B
+
+    subgraph Models
+        C[User]
+        D[Order]
+        E[Product]
+    end
+
+    B --> C
+    B --> D
+    B --> E
+
+    C -->|hasMany| D
+    D -->|hasMany| E
+    D -->|belongsTo| C
+    E -->|belongsTo| D
+```
+
 **Ruby version**
 - 3.3.6
 
@@ -53,7 +80,13 @@ brew install jq
 ```shell 
 git clone git@github.com:enogrob/order_normalizer_api.git
 cd order_normalize_api
+```
+
+```shell
 rails db:migrate
+```
+
+```shell
 bundle
 ```
 
@@ -84,8 +117,17 @@ Response:
 Examples:
 ```shell
 curl -X POST -F "file=@data_1.txt" http://localhost:3000/orders/upload | jq '.'
+```
+
+```shell
 curl -X POST -F "file=@data_2.txt" http://localhost:3000/orders/upload | jq '.'
+```
+
+```shell
 curl -X POST -F "file=@data_invalid.txt" http://localhost:3000/orders/upload | jq '.'
+```
+
+```shell
 curl -X POST -F "file=@data_empty.txt" http://localhost:3000/orders/upload | jq '.''.'
 ```
 
@@ -105,6 +147,9 @@ Response:
 Examples:
 ```shell
 curl "http://localhost:3000/orders?id=628" | jq '.'
+```
+
+```shell
 curl "http://localhost:3000/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
 ```
 
