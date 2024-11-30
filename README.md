@@ -38,34 +38,17 @@ graph TD
 ```    
 
 This diagram shows the flow of data from the user uploading a file to the server processing it and interacting with the database, and finally returning a JSON response to the user. 
-This project adheres to SOLID principles, ensuring robustness, scalability, and maintainability.
-
-# Components Diagram
 
 ```mermaid
-graph TD
-    subgraph Components
-        A[OrdersController]
-        B[NormalizeFileService]
-    end
-
-    A --> B
-
-    subgraph Models
-        C[User]
-        D[Order]
-        E[Product]
-    end
-
-    B --> C
-    B --> D
-    B --> E
-
-    C -->|hasMany| D
-    D -->|hasMany| E
+graph LR
+    C[User] -->|hasMany| D[Order]
+    D -->|hasMany| E[Product]
     D -->|belongsTo| C
     E -->|belongsTo| D
 ```
+
+Here there is the Models relationships diagram.
+This project adheres to SOLID principles, ensuring robustness, scalability, and maintainability.
 
 **Ruby version**
 - 3.3.6
@@ -152,9 +135,3 @@ curl "http://localhost:3000/orders?id=628" | jq '.'
 ```shell
 curl "http://localhost:3000/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
 ```
-
-
-<!-- **Additional Information**
-* This application uses Solid Queue for job processing and Solid Cache for caching.
-* The application is configured to run in a Docker container for production deployment. -->
-
