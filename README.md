@@ -1,6 +1,8 @@
 # README
 
-`order_normalizer_api` is a Ruby on Rails REST API designed to process and normalize legacy data files. It accepts files as input, normalizes the data, and returns the processed output, utilizing flexible persistence methods like file storage, databases, or streams. The API supports order querying with filters for order ID and purchase date ranges, ensuring robust functionality through adherence to SOLID design principles.
+The `order_normalizer_api` is a Ruby on Rails REST API designed to process and normalize legacy data files. 
+It accepts files as input, normalizes the data, and returns the processed output, utilizing flexible persistence methods like file storage, databases, or streams. 
+The API supports order querying with filters for order ID and purchase date ranges, ensuring robust functionality through adherence to SOLID design principles.
 
 # Architecture Diagram
 
@@ -71,6 +73,11 @@ rails db:migrate
 ```shell
 bundle
 ```
+```shell
+:
+Bundle complete! 16 Gemfile dependencies, 111 gems now installed.
+Use `bundle info [gemname]` to see where a bundled gem is installed.
+```
 
 **How to run the test suite**
 
@@ -78,11 +85,58 @@ Run your tests  using rspec.
 ```shell
 bundle exec rspec
 ```
+```shell
+:
+OrdersController
+  POST #upload
+    with valid file
+      returns a successful response
+    with invalid file
+      returns an error response
+    with empty file
+      returns a successful response with an empty array
+  GET #index
+    returns a list of orders
+    filters orders by id
+    filters orders by date range
+
+NormalizeFileService
+  .process
+    with valid file
+      processes the file successfully
+    with invalid file
+      raises InvalidFileFormatError
+    with empty file
+      raises InvalidFileFormatError
+
+Finished in 0.37095 seconds (files took 3.26 seconds to load)
+9 examples, 0 failures
+
+Coverage report generated for RSpec to /Volumes/data/enogrob/Things/Projects/job-luizalabs/src/order_normalizer_api/coverage.
+Line Coverage: 90.32% (56 / 62)
+```
 
 `SimpleCov` will generate a coverage report in the coverage directory.
 Open the `index.html` file in the coverage directory in your browser to view the test coverage report.
 ```shell
 open coverage/index.html
+```
+```shell
+:
+All Files ( 90.32% covered at 1.95 hits/line )
+10 files in total.
+62 relevant lines, 56 lines covered and 6 lines missed. ( 90.32% )
+:
+File	                                  % covered	 Lines	Relevant Lines	Lines covered	Lines missed	Avg. Hits / Line
+:
+app/controllers/application_controller.rb 100.00 %	   2	             1	            1	           0	            1.00
+app/controllers/orders_controller.rb      100.00 %	  36 	            16	           16	           0	            2.25
+app/errors/invalid_file_format_error.rb   100.00 %     5	             3	            3	           0	            1.67
+app/models/application_record.rb          100.00 %	   3	             2	            2	           0	            1.00
+app/models/order.rb                       100.00 %	   4	             3	            3	           0	            1.00
+app/models/product.rb                     100.00 %	   3	             2	            2	           0	            1.00
+app/models/user.rb                        100.00 %	   3	             2	            2	           0	            1.00
+app/services/normalize_file_service.rb    100.00 %	  52	            27	           27	           0	            2.59
 ```
 
 **Services (job queues, cache servers, search engines, etc.)**
@@ -93,6 +147,22 @@ open coverage/index.html
 Start Ruby on Rails in one Terminal:
 ```shell
 bin/dev
+```
+```shell
+:
+=> Booting Puma
+=> Rails 8.0.0 application starting in development 
+=> Run `bin/rails server --help` for more startup options
+Puma starting in single mode...
+* Puma version: 6.5.0 ("Sky's Version")
+* Ruby version: ruby 3.3.6 (2024-11-05 revision 75015d4c1f) [x86_64-darwin23]
+*  Min threads: 3
+*  Max threads: 3
+*  Environment: development
+*          PID: 27538
+* Listening on http://127.0.0.1:3000
+* Listening on http://[::1]:3000
+Use Ctrl-C to stop
 ```
 
 Perform below in the other Terminal:
@@ -108,17 +178,69 @@ Examples:
 ```shell
 curl -X POST -F "file=@data_1.txt" http://localhost:3000/orders/upload | jq '.'
 ```
+```json
+:
+{
+    "user_id": 62,
+    "name": "Jonah Satterfield",
+    "orders": [
+      {
+        "order_id": 673,
+        "total": "851.01",
+        "date": "2021-08-29",
+        "products": [
+          {
+            "product_id": 3,
+            "value": 851.01
+          }
+        ]
+      }
+    ]
+  }
+]
+```
 
 ```shell
 curl -X POST -F "file=@data_2.txt" http://localhost:3000/orders/upload | jq '.'
+```
+```json
+:
+{
+    "user_id": 199,
+    "name": "Miss Terry Boyle",
+    "orders": [
+      {
+        "order_id": 1829,
+        "total": "1263.59",
+        "date": "2021-06-25",
+        "products": [
+          {
+            "product_id": 3,
+            "value": 1263.59
+          }
+        ]
+      }
+    ]
+  }
+]
 ```
 
 ```shell
 curl -X POST -F "file=@data_invalid.txt" http://localhost:3000/orders/upload | jq '.'
 ```
+```json
+{
+  "error": "Error parsing line: 1234567890John Doe                         12345678901234567890123456789012345678901234567890123456789012345678901234567890\n. Error: invalid date"
+}
+```
 
 ```shell
 curl -X POST -F "file=@data_empty.txt" http://localhost:3000/orders/upload | jq '.''.'
+```
+```json
+{
+  "error": "The file is empty."
+}
 ```
 
 Error Handling
@@ -138,7 +260,67 @@ Examples:
 ```shell
 curl "http://localhost:3000/orders?id=628" | jq '.'
 ```
+```json
+[
+  {
+    "order_id": 628,
+    "total": "4132.24",
+    "date": "2021-03-08",
+    "products": [
+      {
+        "product_id": 4,
+        "value": "1396.87"
+      },
+      {
+        "product_id": 3,
+        "value": "1940.89"
+      },
+      {
+        "product_id": 4,
+        "value": "794.48"
+      }
+    ]
+  },
+  {
+    "order_id": 628,
+    "total": "804.47",
+    "date": "2021-09-11",
+    "products": [
+      {
+        "product_id": 4,
+        "value": "804.47"
+      }
+    ]
+  }
+]
+```
 
 ```shell
 curl "http://localhost:3000/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
+```
+```json
+:
+ {
+    "order_id": 702,
+    "total": "1419.69",
+    "date": "2021-07-18",
+    "products": [
+      {
+        "product_id": 2,
+        "value": "1419.69"
+      }
+    ]
+  },
+  {
+    "order_id": 1842,
+    "total": "1382.56",
+    "date": "2021-04-04",
+    "products": [
+      {
+        "product_id": 4,
+        "value": "1382.56"
+      }
+    ]
+  }
+]
 ```

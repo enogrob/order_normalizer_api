@@ -33,4 +33,5 @@
 
 # Ignore data files and finder icons
 Icon*
+coverage/*
 
