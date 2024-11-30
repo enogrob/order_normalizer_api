@@ -1,9 +1,7 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+`order_normalizer_api` is a Ruby on Rails REST API designed to process and normalize legacy data files. It accepts files as input, normalizes the data, and returns the processed output, utilizing flexible persistence methods like file storage, databases, or streams. The API supports order querying with filters for order ID and purchase date ranges, ensuring robust functionality through adherence to SOLID design principles.
 
-Things you may want to cover:
 # Architecture Diagram
 
 ```mermaid
@@ -48,6 +46,7 @@ graph LR
 ```
 
 Here there is the Models relationships diagram.
+
 This project adheres to SOLID principles, ensuring robustness, scalability, and maintainability.
 
 **Ruby version**
@@ -74,8 +73,16 @@ bundle
 ```
 
 **How to run the test suite**
+
+Run your tests  using rspec. 
 ```shell
 bundle exec rspec
+```
+
+`SimpleCov` will generate a coverage report in the coverage directory.
+Open the `index.html` file in the coverage directory in your browser to view the test coverage report.
+```shell
+open coverage/index.html
 ```
 
 **Services (job queues, cache servers, search engines, etc.)**
