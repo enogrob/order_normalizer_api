@@ -1,10 +1,24 @@
 # README
 
+```
+Author  : Roberto Nogueira
+Date    : 2024-11
+Project : Order Normalizer API
+```
+
+Author profile can be accessed in [LinkedIn](https://www.linkedin.com/in/enogrob/), and the Repo was created in 
+[Github](https://github.com/enogrob/order_normalizer_api). 
+See if required the 
+[Luizalabs](https://www.linkedin.com/company/luizalabs/posts/?feedView=all) job 
+[Job Description](https://www.linkedin.com/jobs/search/?currentJobId=4071757766&f_C=10435733&geoId=92000000&origin=COMPANY_PAGE_JOBS_CLUSTER_EXPANSION&originToLandingJobPostings=4083026839%2C4071757766%2C4084141403%2C4077188554%2C4083348762%2C4083025603%2C4083029211%2C4083029455%2C4083022862)
+
+---
+
 The `order_normalizer_api` is a Ruby on Rails REST API designed to process and normalize legacy data files. 
 It accepts files as input, normalizes the data, and returns the processed output, utilizing flexible persistence methods like file storage, databases, or streams. 
 The API supports order querying with filters for order ID and purchase date ranges, ensuring robust functionality through adherence to SOLID design principles.
 
-# Architecture Diagram
+## Architecture Diagram
 
 ```mermaid
 graph TD
@@ -51,16 +65,24 @@ Here there is the Models relationships diagram.
 
 This project adheres to SOLID principles, ensuring robustness, scalability, and maintainability.
 
-**Ruby version**
-- 3.3.6
 
-**System dependencies**
-- Lightweight and flexible command-line JSON processor
+
+## System dependencies
+
+- [Ruby 3.3.6](https://www.ruby-lang.org/en/news/2024/11/05/ruby-3-3-6-released/) Ruby programming language.
+```shell
+brew install asdf
+asdf plugin add ruby
+asdf install ruby 3.3.6
+echo ". /usr/local/opt/asdf/libexec/asdf.sh" >> ~/.zshrc
+. ~/.zshrc
+```
+- [Jq](https://jqlang.github.io/jq) Lightweight and flexible command-line JSON processor.
 ```shell
 brew install jq
 ```
 
-**Configuration**
+## Configuration
 ```shell 
 git clone git@github.com:enogrob/order_normalizer_api.git
 cd order_normalize_api
@@ -79,7 +101,7 @@ Bundle complete! 16 Gemfile dependencies, 111 gems now installed.
 Use `bundle info [gemname]` to see where a bundled gem is installed.
 ```
 
-**How to run the test suite**
+### How to run the test suite
 
 Run your tests  using rspec. 
 ```shell
@@ -139,9 +161,9 @@ app/models/user.rb                        100.00 %	   3	             2	         
 app/services/normalize_file_service.rb    100.00 %	  52	            27	           27	           0	            2.59
 ```
 
-**Services (job queues, cache servers, search engines, etc.)**
+### Services (job queues, cache servers, search engines, etc.)
 
-**Deployment instructions**
+### Deployment instructions
 
 Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project, generate a `fly.toml` file, containerize the app with Docker, and push it to Fly.io. Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with Fly.io commands.
 
@@ -157,7 +179,7 @@ flowchart TD
 
 This diagram captures the workflow and emphasizes the iterative nature of fly deploy if changes are made to the application.
 
-**How to run with API Endpoints**
+### How to run with API Endpoints
 Start Ruby on Rails in one Terminal:
 ```shell
 bin/dev
@@ -349,4 +371,23 @@ curl "$HOST_API/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
     ]
   }
 ]
+```
+
+## Git Graph
+
+```mermaid
+gitGraph
+   commit id: "ruby-on-rails-setup"
+   commit id: "models-setup"
+   commit id: "services-setup"
+   commit id: "controllers-setup"
+   commit id: "tests-setup"
+   commit id: "errors-handling-setup"
+   commit id: "readme-setup"
+   commit id: "solid-compliance-check"
+   commit id: "readme-add-components-diagram"
+   commit id: "readme-add-refinements"
+   commit id: "test-coverage-and-test-files-setup"
+   commit id: "readme-and-gitignore-improved"
+   commit id: "deploy-setup" type: HIGHLIGHT
 ```
