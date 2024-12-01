@@ -1,5 +1,7 @@
 # README
 
+![](public/screenshot_12.png)
+
 ```
 Author  : Roberto Nogueira
 Date    : 2024-11
@@ -65,9 +67,9 @@ graph TD
       B --> |belongs_to| A
       B --> |belongs_to| C
       C -->|has_many| B
-      A --> |inherits| D
-      B --> |inherits| D
-      C --> |inherits| D
+      A --> |is_a| D
+      B --> |is_a| D
+      C --> |is_a| D
     end
 ```
 
