@@ -65,8 +65,8 @@ graph TD
       
       A -->|has_many| B
       B --> |belongs_to| A
-      B --> |belongs_to| C
-      C -->|has_many| B
+      B --> |has_many| C
+      C -->|belongs_to| B
       A --> |is_a| D
       B --> |is_a| D
       C --> |is_a| D
