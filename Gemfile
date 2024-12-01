@@ -53,3 +53,5 @@ end
 gem "rspec-rails", "~> 7.1", groups: [ :development, :test ]
 
 gem "factory_bot_rails", "~> 6.4", groups: [ :development, :test ]
+
+gem "dockerfile-rails", ">= 1.6", :group => :development

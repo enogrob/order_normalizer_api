@@ -143,6 +143,20 @@ app/services/normalize_file_service.rb    100.00 %	  52	            27	         
 
 **Deployment instructions**
 
+Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project, generate a `fly.toml` file, containerize the app with Docker, and push it to Fly.io. Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with Fly.io commands.
+
+```mermaid
+flowchart TD
+    A[fly launch] --> B[fly deploy]
+    B -->|Repeat if changes occur| B
+    B --> C[fly apps open]
+    C --> D[fly logs]
+    D --> E[fly apps destroy order-normalizer-api]
+    E -->|If required| A
+```
+
+This diagram captures the workflow and emphasizes the iterative nature of fly deploy if changes are made to the application.
+
 **How to run with API Endpoints**
 Start Ruby on Rails in one Terminal:
 ```shell
@@ -166,6 +180,18 @@ Use Ctrl-C to stop
 ```
 
 Perform below in the other Terminal:
+Note:
+When running locally 
+```shell
+HOST_API=https://localhost:3000
+
+```
+
+When running the deployed
+```shell
+HOST_API=https://order-normalizer-api.fly.dev/orders/upload
+```
+
 Upload Order File
 * URL: /orders/upload
 * Method: POST
@@ -176,7 +202,7 @@ Response:
 * 422 Unprocessable Entity: Error processing the file.
 Examples:
 ```shell
-curl -X POST -F "file=@data_1.txt" http://localhost:3000/orders/upload | jq '.'
+curl -X POST -F "file=@data_1.txt" $HOST_API/orders/upload | jq '.'
 ```
 ```json
 :
@@ -201,7 +227,7 @@ curl -X POST -F "file=@data_1.txt" http://localhost:3000/orders/upload | jq '.'
 ```
 
 ```shell
-curl -X POST -F "file=@data_2.txt" http://localhost:3000/orders/upload | jq '.'
+curl -X POST -F "file=@data_2.txt" $HOST_API/orders/upload | jq '.'
 ```
 ```json
 :
@@ -226,7 +252,7 @@ curl -X POST -F "file=@data_2.txt" http://localhost:3000/orders/upload | jq '.'
 ```
 
 ```shell
-curl -X POST -F "file=@data_invalid.txt" http://localhost:3000/orders/upload | jq '.'
+curl -X POST -F "file=@data_invalid.txt" $HOST_API/orders/upload | jq '.'
 ```
 ```json
 {
@@ -235,7 +261,7 @@ curl -X POST -F "file=@data_invalid.txt" http://localhost:3000/orders/upload | j
 ```
 
 ```shell
-curl -X POST -F "file=@data_empty.txt" http://localhost:3000/orders/upload | jq '.''.'
+curl -X POST -F "file=@data_empty.txt" $HOST_API/orders/upload | jq '.''.'
 ```
 ```json
 {
@@ -258,7 +284,7 @@ Response:
 * 200 OK: List of orders.
 Examples:
 ```shell
-curl "http://localhost:3000/orders?id=628" | jq '.'
+curl "$HOST_API/orders?id=628" | jq '.'
 ```
 ```json
 [
@@ -296,7 +322,7 @@ curl "http://localhost:3000/orders?id=628" | jq '.'
 ```
 
 ```shell
-curl "http://localhost:3000/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
+curl "$HOST_API/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
 ```
 ```json
 :
