@@ -75,18 +75,31 @@ This project adheres to SOLID principles, ensuring robustness, scalability, and 
 
 ## System dependencies
 
-- [Ruby 3.3.6](https://www.ruby-lang.org/en/news/2024/11/05/ruby-3-3-6-released/) Ruby programming language.
+- Asdf, [Ruby](https://www.ruby-lang.org/en/news/2024/11/05/ruby-3-3-6-released/), Rails and Nodejs.
 ```shell
 brew install asdf
+echo ". /usr/local/opt/asdf/libexec/asdf.sh" >> $HOME/.zshrc
+source $HOME/.zshrc
 asdf plugin add ruby
+asdf plugin add nodejs
 asdf install ruby 3.3.6
-echo ". /usr/local/opt/asdf/libexec/asdf.sh" >> ~/.zshrc
-. ~/.zshrc
+asdf install nodejs latest
+asdf global ruby 3.3.6
+asdf global nodejs latest
+gem install rails -v '8.0.0'
 ```
 - [Jq](https://jqlang.github.io/jq) Lightweight and flexible command-line JSON processor.
 ```shell
 brew install jq
 ```
+- [fly.io]() and [Docker](https://www.docker.com/products/docker-desktop).
+```shell
+brew install flyctl
+curl -L https://fly.io/install.sh | sh
+echo "export FLYCTL_INSTALL=/Users/enogrob/.fly" >> $HOME/.zshrc
+echo "export PATH=\$FLYCTL_INSTALL/bin:\$PATH" >> $HOME/.zshrc
+brew install --cask docker
+``` 
 
 ## Configuration
 ```shell 
