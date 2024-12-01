@@ -54,11 +54,17 @@ graph TD
 This diagram shows the flow of data from the user uploading a file to the server processing it and interacting with the database, and finally returning a JSON response to the user. 
 
 ```mermaid
-graph LR
-    C[User] -->|hasMany| D[Order]
-    D -->|hasMany| E[Product]
-    D -->|belongsTo| C
-    E -->|belongsTo| D
+graph TD
+    subgraph Models relationships
+      A[User]
+      B[Order]
+      C[Product]
+      
+      A -->|has_many| B
+      B --> |belongs_to| A
+      B --> |belongs_to| C
+      C -->|has_many| B
+    end
 ```
 
 Here there is the Models relationships diagram.
@@ -160,24 +166,6 @@ app/models/product.rb                     100.00 %	   3	             2	         
 app/models/user.rb                        100.00 %	   3	             2	            2	           0	            1.00
 app/services/normalize_file_service.rb    100.00 %	  52	            27	           27	           0	            2.59
 ```
-
-### Services (job queues, cache servers, search engines, etc.)
-
-### Deployment instructions
-
-Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project, generate a `fly.toml` file, containerize the app with Docker, and push it to Fly.io. Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with Fly.io commands.
-
-```mermaid
-flowchart TD
-    A[fly launch] --> B[fly deploy]
-    B -->|Repeat if changes occur| B
-    B --> C[fly apps open]
-    C --> D[fly logs]
-    D --> E[fly apps destroy order-normalizer-api]
-    E -->|If required| A
-```
-
-This diagram captures the workflow and emphasizes the iterative nature of fly deploy if changes are made to the application.
 
 ### How to run with API Endpoints
 Start Ruby on Rails in one Terminal:
@@ -372,6 +360,37 @@ curl "$HOST_API/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
   }
 ]
 ```
+
+### Services (job queues, cache servers, search engines, etc.)
+
+### Deployment instructions
+
+Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project (also [Docker](https://www.docker.com/products/docker-desktop/) is required), generate a `fly.toml` file, containerize the app with Docker, and push it to Fly.io. Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with Fly.io commands.
+
+```mermaid
+graph TD
+    subgraph Fly.io Commands
+        A[fly launch]
+        B[fly deploy]
+        C[fly apps open]
+        D[fly logs]
+        E[fly apps destroy order-normalizer-api]
+        F[fly ssh console]
+        G[fly console]
+
+        A --> B
+        B --> C
+        B --> |repeat if changes occur| B
+        C --> D
+        C --> G
+        C --> F
+        C --> |if required| E
+        E --> A
+    end
+```
+
+This diagram captures the workflow and emphasizes the iterative nature of fly deploy if changes are made to the application.
+
 
 ## Git Graph
 
