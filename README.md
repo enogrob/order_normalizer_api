@@ -59,11 +59,15 @@ graph TD
       A[User]
       B[Order]
       C[Product]
+      D[ApplicationRecord]
       
       A -->|has_many| B
       B --> |belongs_to| A
       B --> |belongs_to| C
       C -->|has_many| B
+      A --> |inherits| D
+      B --> |inherits| D
+      C --> |inherits| D
     end
 ```
 
@@ -75,7 +79,7 @@ This project adheres to SOLID principles, ensuring robustness, scalability, and 
 
 ## System dependencies
 
-- Asdf, [Ruby](https://www.ruby-lang.org/en/news/2024/11/05/ruby-3-3-6-released/), Rails and Nodejs.
+- [Asdf](https://asdf-vm.com), [Ruby](https://www.ruby-lang.org/en/news/2024/11/05/ruby-3-3-6-released/), [Rails](https://rubyonrails.org/) and [Nodejs](https://nodejs.org/en).
 ```shell
 brew install asdf
 echo ". /usr/local/opt/asdf/libexec/asdf.sh" >> $HOME/.zshrc
@@ -83,22 +87,23 @@ source $HOME/.zshrc
 asdf plugin add ruby
 asdf plugin add nodejs
 asdf install ruby 3.3.6
-asdf install nodejs latest
+asdf install nodejs 23.2.0
 asdf global ruby 3.3.6
-asdf global nodejs latest
+asdf global nodejs 23.2.0
 gem install rails -v '8.0.0'
 ```
 - [Jq](https://jqlang.github.io/jq) Lightweight and flexible command-line JSON processor.
 ```shell
 brew install jq
 ```
-- [fly.io]() and [Docker](https://www.docker.com/products/docker-desktop).
+- [Fly.io]() and [Docker](https://www.docker.com/products/docker-desktop).
 ```shell
 brew install flyctl
 curl -L https://fly.io/install.sh | sh
 echo "export FLYCTL_INSTALL=/Users/enogrob/.fly" >> $HOME/.zshrc
 echo "export PATH=\$FLYCTL_INSTALL/bin:\$PATH" >> $HOME/.zshrc
 brew install --cask docker
+source $HOME/.zshrc
 ``` 
 
 ## Configuration
@@ -378,7 +383,7 @@ curl "$HOST_API/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
 
 ### Deployment instructions
 
-Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project (also [Docker](https://www.docker.com/products/docker-desktop/) is required), generate a `fly.toml` file, containerize the app with Docker, and push it to Fly.io. Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with Fly.io commands.
+Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project (also [Docker](https://www.docker.com/products/docker-desktop/) is required), generate a `fly.toml` file, containerize the app with Docker, and push it to [Fly.io](https://fly.io). Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with [Fly.io](https://fly.io) commands.
 
 ```mermaid
 graph TD
@@ -404,7 +409,6 @@ graph TD
 
 This diagram captures the workflow and emphasizes the iterative nature of fly deploy if changes are made to the application.
 
-
 ## Git Graph
 
 ```mermaid
@@ -423,3 +427,36 @@ gitGraph
    commit id: "readme-and-gitignore-improved"
    commit id: "deploy-setup" type: HIGHLIGHT
 ```
+
+## References
+
+Here are some valuable resources for the technologies used in this project:
+
+1. **Ruby on Rails**
+   - [Official Ruby on Rails Guides](https://guides.rubyonrails.org/)
+   - [Ruby on Rails API Documentation](https://api.rubyonrails.org/)
+   - [RailsCasts](http://railscasts.com/)
+
+2. **RSpec**
+   - [Official RSpec Documentation](https://rspec.info/documentation/)
+   - [Better Specs](http://www.betterspecs.org/)
+
+3. **SimpleCov**
+   - [SimpleCov GitHub Repository](https://github.com/simplecov-ruby/simplecov)
+   - [SimpleCov Documentation](https://github.com/simplecov-ruby/simplecov#readme)
+
+4. **Fly.io**
+   - [Fly.io Documentation](https://fly.io/docs/)
+   - [Fly.io GitHub Repository](https://github.com/superfly/flyctl)
+
+5. **Docker**
+   - [Docker Documentation](https://docs.docker.com/)
+   - [Docker Hub](https://hub.docker.com/)
+
+6. **Git**
+   - [Pro Git Book](https://git-scm.com/book/en/v2)
+   - [Git Documentation](https://git-scm.com/doc)
+
+7. **Mermaid**
+   - [Mermaid Documentation](https://mermaid.js.org/intro/)
+   - [Mermaid Github Repository](https://github.com/mermaid-js/mermaid)
