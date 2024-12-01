@@ -212,7 +212,7 @@ HOST_API=https://localhost:3000
 
 When running the deployed
 ```shell
-HOST_API=https://order-normalizer-api.fly.dev/orders/upload
+HOST_API=https://order-normalizer-api.fly.dev
 ```
 
 Upload Order File
@@ -284,7 +284,7 @@ curl -X POST -F "file=@data_invalid.txt" $HOST_API/orders/upload | jq '.'
 ```
 
 ```shell
-curl -X POST -F "file=@data_empty.txt" $HOST_API/orders/upload | jq '.''.'
+curl -X POST -F "file=@data_empty.txt" $HOST_API/orders/upload | jq '.'
 ```
 ```json
 {
