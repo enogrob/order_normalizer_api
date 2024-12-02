@@ -213,7 +213,7 @@ Perform below in the other Terminal:
 Note:
 When running locally 
 ```shell
-HOST_API=https://localhost:3000
+HOST_API=http://localhost:3000
 
 ```
 
