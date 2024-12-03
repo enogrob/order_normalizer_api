@@ -17,7 +17,7 @@ See if required the
 ---
 
 The `order_normalizer_api` is a Ruby on Rails REST API designed to process and normalize legacy data files. 
-It accepts files as input, normalizes the data, and returns the processed output, utilizing flexible persistence methods like file storage, databases, or streams. 
+It accepts legacy files as input, normalizes and they are returned. As it supports background jobs processing, i.e. the system is able to enqueuing and retrieving them when required.
 The API supports order querying with filters for order ID and purchase date ranges, ensuring robust functionality through adherence to SOLID design principles.
 
 ## Architecture Diagram
@@ -61,6 +61,7 @@ graph TD
       A[User]
       B[Order]
       C[Product]
+      E[Upload]
       D[ApplicationRecord]
       
       A -->|has_many| B
@@ -70,6 +71,7 @@ graph TD
       A --> |is_a| D
       B --> |is_a| D
       C --> |is_a| D
+      E --> |is_a| D
     end
 ```
 
@@ -129,7 +131,7 @@ bundle
 ```
 ```shell
 :
-Bundle complete! 16 Gemfile dependencies, 111 gems now installed.
+Bundle complete! 19 Gemfile dependencies, 115 gems now installed.
 Use `bundle info [gemname]` to see where a bundled gem is installed.
 ```
 
@@ -212,7 +214,7 @@ Puma starting in single mode...
 *  Min threads: 3
 *  Max threads: 3
 *  Environment: development
-*          PID: 27538
+*          PID: 8300
 * Listening on http://127.0.0.1:3000
 * Listening on http://[::1]:3000
 Use Ctrl-C to stop
@@ -223,6 +225,31 @@ Note:
 When running locally
 ```shell
 bundle exec sidekiq
+```
+```shell
+
+
+               m,
+               `$b
+          .ss,  $$:         .,d$
+          `$$P,d$P'    .,md$P"'
+           ,$$$$$b/md$$$P^'
+         .d$$$$$$/$$$P'
+         $$^' `"/$$$'       ____  _     _      _    _
+         $:    ',$$:       / ___|(_) __| | ___| | _(_) __ _
+         `b     :$$        \___ \| |/ _` |/ _ \ |/ / |/ _` |
+                $$:         ___) | | (_| |  __/   <| | (_| |
+                $$         |____/|_|\__,_|\___|_|\_\_|\__, |
+              .d$$                                       |_|
+      
+
+2024-12-03T00:33:16.529Z pid=8560 tid=9uo INFO: Booted Rails 8.0.0 application in development environment
+2024-12-03T00:33:16.529Z pid=8560 tid=9uo INFO: Running in ruby 3.3.6 (2024-11-05 revision 75015d4c1f) [x86_64-darwin23]
+2024-12-03T00:33:16.529Z pid=8560 tid=9uo INFO: See LICENSE and the LGPL-3.0 for licensing details.
+2024-12-03T00:33:16.530Z pid=8560 tid=9uo INFO: Upgrade to Sidekiq Pro for more features and support: https://sidekiq.org
+2024-12-03T00:33:16.530Z pid=8560 tid=9uo INFO: Sidekiq 7.3.6 connecting to Redis with options {:size=>10, :pool_name=>"internal", :url=>"redis://localhost:6379/0"}
+2024-12-03T00:33:16.564Z pid=8560 tid=9uo INFO: Sidekiq 7.3.6 connecting to Redis with options {:size=>5, :pool_name=>"default", :url=>"redis://localhost:6379/0"}
+2024-12-03T00:33:16.667Z pid=8560 tid=9uo INFO: Starting processing, hit Ctrl-C to stop
 ```
 
 Perform below in the other Terminal:
@@ -292,7 +319,7 @@ Params:
 * upload_id: The order uploaded file id.
 Response:
 * 200 OK: File is still processing
-* 422 Unprocessable Entity: Error processing the file.
+* 422 Upload not found
 Examples:
 
 ```shell
@@ -343,6 +370,16 @@ curl -X GET "http://localhost:3000/orders/results?upload_id=c319265a-2a3c-4c79-8
     ]
   }
 ]
+```
+
+```shell
+curl -X GET "http://localhost:3000/orders/results?upload_id=xxx" | jq '.'
+```
+```json
+:
+{
+  "error": "Upload not found"
+}
 ```
 
 Error Handling
@@ -485,7 +522,9 @@ gitGraph
    commit id: "readme-add-refinements"
    commit id: "test-coverage-and-test-files-setup"
    commit id: "readme-and-gitignore-improved"
-   commit id: "deploy-setup" type: HIGHLIGHT
+   commit id: "deploy-setup" 
+   commit id: "readme-improvements"
+   commit id: "background-jobs-setup" type: HIGHLIGHT
 ```
 
 ## References
