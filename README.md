@@ -186,7 +186,7 @@ Search:
 File	                                      % covered	 Lines	Relevant Lines	Lines covered	Lines missed	Avg. Hits / Line
 app/mailers/application_mailer.rb	             0.00 %	     4	             4	            0	           4	            0.00
 app/workers/file_upload_worker.rb	            23.08 %	    22	            13	            3	          10	            0.23
-app/controllers/orders_controller.rb	        66.67 %	    73	            33	            22	        11	            1.61
+app/controllers/orders_controller.rb	        66.67 %	    73	            33	            22	          11	            1.61
 app/controllers/application_controller.rb	   100.00 %	     2	             1	            1	           0	            1.00
 app/errors/invalid_file_format_error.rb	     100.00 %	     5	             3	            3	           0	            1.33
 app/jobs/application_job.rb	                 100.00 %	     7	             1	            1	           0	            1.00
@@ -575,7 +575,7 @@ Here are some valuable resources for the technologies used in this project:
    - [Mermaid Github Repository](https://github.com/mermaid-js/mermaid)
 
 7. **Redis**
-   - [Redia Documentation](https://redis.io/docs/latest/)
+   - [Redis Documentation](https://redis.io/docs/latest/)
    - [Redis Github Repository](https://github.com/redis/redis)
 
 7. **Sidekiq**
