@@ -487,20 +487,34 @@ graph TD
     subgraph Fly.io Commands
         A[fly launch]
         B[fly deploy]
-        C[fly apps open]
+        M[fly status]
         D[fly logs]
         E[fly apps destroy order-normalizer-api]
-        F[fly ssh console]
-        G[fly console]
+        F[fly ssh console --pty -C '/rails/bin/rails console']
+        G[fly ssh console --pty -C '/bin/bash']
+        H[fly redis create]
+        I[fly redis connect]
+        J[fly ssh console -C '/rails/bin/rails db:migrate']
+        K[bin/rails fly:console]
+        L[fly ssh console -C 'printenv REDIS_URL']
+        N[root]
+        O[bin/rails fly:dbmigrate]
 
-        A --> B
-        B --> C
         B --> |repeat if changes occur| B
-        C --> D
-        C --> G
-        C --> F
-        C --> |if required| E
+        B --> D
+        B --> F
+        B --> |if required| E
         E --> A
+        B --> J
+        B --> G
+        H --> I
+        F --> K
+        H --> L
+        H --> A
+        A --> B
+        N --> H
+        N --> M
+        J --> O
     end
 ```
 

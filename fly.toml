@@ -1,4 +1,4 @@
-# fly.toml app configuration file generated for order-normalizer-api on 2024-11-30T21:28:31-03:00
+# fly.toml app configuration file generated for order-normalizer-api on 2024-12-03T07:41:58-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
@@ -10,12 +10,11 @@ console_command = '/rails/bin/rails console'
 [build]
 
 [env]
-  DATABASE_URL = 'sqlite3:///data/production.sqlite3'
-  HTTP_PORT = '8080'
+  REDIS_URL = 'redis://default:eb878717ff7f43a284257a01671ce16b@fly-order-normalizer-api-redis.upstash.io:6379'
 
-[[mounts]]
-  source = 'data'
-  destination = '/data'
+[processes]
+  web = 'bin/rails server'
+  worker = 'bundle exec sidekiq -C config/sidekiq.yml'
 
 [http_service]
   internal_port = 8080
@@ -23,9 +22,9 @@ console_command = '/rails/bin/rails console'
   auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-  processes = ['app']
+  processes = ['web']
 
 [[vm]]
-  memory = '1gb'
+  memory = '2gb'
   cpu_kind = 'shared'
   cpus = 1
