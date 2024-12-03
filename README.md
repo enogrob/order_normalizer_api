@@ -107,6 +107,12 @@ echo "export PATH=\$FLYCTL_INSTALL/bin:\$PATH" >> $HOME/.zshrc
 brew install --cask docker
 source $HOME/.zshrc
 ``` 
+- [Redis](https://redis.io/) Persistent key-value database, with built-in net interface
+```
+brew install redis
+brew services start redis
+brew services list
+```
 
 ## Configuration
 ```shell 
@@ -138,11 +144,11 @@ bundle exec rspec
 OrdersController
   POST #upload
     with valid file
-      returns a successful response
+      enqueues a file processing job
     with invalid file
-      returns an error response
+      returns an error
     with empty file
-      returns a successful response with an empty array
+      returns an error
   GET #index
     returns a list of orders
     filters orders by id
@@ -157,11 +163,11 @@ NormalizeFileService
     with empty file
       raises InvalidFileFormatError
 
-Finished in 0.37095 seconds (files took 3.26 seconds to load)
+Finished in 0.67809 seconds (files took 4.04 seconds to load)
 9 examples, 0 failures
 
 Coverage report generated for RSpec to /Volumes/data/enogrob/Things/Projects/job-luizalabs/src/order_normalizer_api/coverage.
-Line Coverage: 90.32% (56 / 62)
+Line Coverage: 77.48% (86 / 111)
 ```
 
 `SimpleCov` will generate a coverage report in the coverage directory.
@@ -171,20 +177,23 @@ open coverage/index.html
 ```
 ```shell
 :
-All Files ( 90.32% covered at 1.95 hits/line )
-10 files in total.
-62 relevant lines, 56 lines covered and 6 lines missed. ( 90.32% )
-:
-File	                                  % covered	 Lines	Relevant Lines	Lines covered	Lines missed	Avg. Hits / Line
-:
-app/controllers/application_controller.rb 100.00 %	   2	             1	            1	           0	            1.00
-app/controllers/orders_controller.rb      100.00 %	  36 	            16	           16	           0	            2.25
-app/errors/invalid_file_format_error.rb   100.00 %     5	             3	            3	           0	            1.67
-app/models/application_record.rb          100.00 %	   3	             2	            2	           0	            1.00
-app/models/order.rb                       100.00 %	   4	             3	            3	           0	            1.00
-app/models/product.rb                     100.00 %	   3	             2	            2	           0	            1.00
-app/models/user.rb                        100.00 %	   3	             2	            2	           0	            1.00
-app/services/normalize_file_service.rb    100.00 %	  52	            27	           27	           0	            2.59
+All Files ( 73.96% covered at 1.54 hits/line )
+12 files in total.
+96 relevant lines, 71 lines covered and 25 lines missed. ( 73.96% )
+Search:
+File	                                      % covered	 Lines	Relevant Lines	Lines covered	Lines missed	Avg. Hits / Line
+app/mailers/application_mailer.rb	             0.00 %	     4	             4	            0	           4	            0.00
+app/workers/file_upload_worker.rb	            23.08 %	    22	            13	            3	          10	            0.23
+app/controllers/orders_controller.rb	        66.67 %	    73	            33	            22	        11	            1.61
+app/controllers/application_controller.rb	   100.00 %	     2	             1	            1	           0	            1.00
+app/errors/invalid_file_format_error.rb	     100.00 %	     5	             3	            3	           0	            1.33
+app/jobs/application_job.rb	                 100.00 %	     7	             1	            1	           0	            1.00
+app/models/application_record.rb	           100.00 %	     3	             2	            2	           0	            1.00
+app/models/order.rb	                         100.00 %	     6	             4	            4	           0	            1.00
+app/models/product.rb	                       100.00 %	     3	             2	            2	           0	            1.00
+app/models/upload.rb	                       100.00 %	     5	             3	            3	           0	            1.00
+app/models/user.rb	                         100.00 %	     3	             2	            2	           0	            1.00
+app/services/normalize_file_service.rb	     100.00 %	    53	            28	           28	           0	            2.61
 ```
 
 ### How to run with API Endpoints
@@ -209,6 +218,13 @@ Puma starting in single mode...
 Use Ctrl-C to stop
 ```
 
+Start Sidekiq in other Terminal:
+Note:
+When running locally
+```shell
+bundle exec sidekiq
+```
+
 Perform below in the other Terminal:
 Note:
 When running locally 
@@ -228,11 +244,59 @@ Upload Order File
 Params:
 * file: The order file to be uploaded.
 Response:
-* 200 OK: Successfully processed the file.
+* 200 OK: File processing started
 * 422 Unprocessable Entity: Error processing the file.
 Examples:
 ```shell
 curl -X POST -F "file=@data_1.txt" $HOST_API/orders/upload | jq '.'
+```
+```json
+{
+  "message": "File processing started",
+  "upload_id": "24ceccff-860e-4e89-8c18-9237b287aba7"
+}
+```
+
+```shell
+curl -X POST -F "file=@data_2.txt" $HOST_API/orders/upload | jq '.'
+```
+```json
+{
+  "message": "File processing started",
+  "upload_id": "c319265a-2a3c-4c79-8fcb-b79a5e7c7b55"
+}
+```
+
+```shell
+curl -X POST -F "file=@data_invalid.txt" $HOST_API/orders/upload | jq '.'
+```
+```json
+{
+  "error": "Error parsing line: 1234567890John Doe                         12345678901234567890123456789012345678901234567890123456789012345678901234567890\n. Error: invalid date"
+}
+```
+
+```shell
+curl -X POST -F "file=@data_empty.txt" $HOST_API/orders/upload | jq '.'
+```
+```json
+{
+  "error": "The file is empty."
+}
+```
+
+Get Uploaded Order File Results
+* URL: /orders/result
+* Method: GET
+Params:
+* upload_id: The order uploaded file id.
+Response:
+* 200 OK: File is still processing
+* 422 Unprocessable Entity: Error processing the file.
+Examples:
+
+```shell
+curl -X GET "http://localhost:3000/orders/results?upload_id=24ceccff-860e-4e89-8c18-9237b287aba7" | jq '.'
 ```
 ```json
 :
@@ -257,7 +321,7 @@ curl -X POST -F "file=@data_1.txt" $HOST_API/orders/upload | jq '.'
 ```
 
 ```shell
-curl -X POST -F "file=@data_2.txt" $HOST_API/orders/upload | jq '.'
+curl -X GET "http://localhost:3000/orders/results?upload_id=c319265a-2a3c-4c79-8fcb-b79a5e7c7b55" | jq '.'
 ```
 ```json
 :
@@ -279,24 +343,6 @@ curl -X POST -F "file=@data_2.txt" $HOST_API/orders/upload | jq '.'
     ]
   }
 ]
-```
-
-```shell
-curl -X POST -F "file=@data_invalid.txt" $HOST_API/orders/upload | jq '.'
-```
-```json
-{
-  "error": "Error parsing line: 1234567890John Doe                         12345678901234567890123456789012345678901234567890123456789012345678901234567890\n. Error: invalid date"
-}
-```
-
-```shell
-curl -X POST -F "file=@data_empty.txt" $HOST_API/orders/upload | jq '.'
-```
-```json
-{
-  "error": "The file is empty."
-}
 ```
 
 Error Handling
@@ -383,6 +429,18 @@ curl "$HOST_API/orders?start_date=2021-01-01&end_date=2021-12-31" | jq '.'
 
 ### Services (job queues, cache servers, search engines, etc.)
 
+This project uses Redis and Sidekiq for background job processing.
+
+#### Redis:
+- Redis is an in-memory data structure store, used as a database, cache, and message broker.
+- In this project, Redis is used to store job data and manage job queues.
+
+#### Sidekiq:
+- Sidekiq is a background job processing library for Ruby.
+- It uses threads to handle many jobs at the same time in the same process.
+- Sidekiq relies on Redis to store all job-related data.
+- In this project, Sidekiq is used to process background jobs, such as legacy files in order to be normalized.
+
 ### Deployment instructions
 
 Deploying a Ruby on Rails app to [Fly.io](https://fly.io) involves using the [flyctl CLI](https://fly.io/docs/flyctl/install/) to initialize a project (also [Docker](https://www.docker.com/products/docker-desktop/) is required), generate a `fly.toml` file, containerize the app with Docker, and push it to [Fly.io](https://fly.io). Once deployed, the app goes live with provisioned resources. You can monitor logs, scale instances, and manage secrets with [Fly.io](https://fly.io) commands.
@@ -462,3 +520,11 @@ Here are some valuable resources for the technologies used in this project:
 7. **Mermaid**
    - [Mermaid Documentation](https://mermaid.js.org/intro/)
    - [Mermaid Github Repository](https://github.com/mermaid-js/mermaid)
+
+7. **Redis**
+   - [Redia Documentation](https://redis.io/docs/latest/)
+   - [Redis Github Repository](https://github.com/redis/redis)
+
+7. **Sidekiq**
+   - [Sidekiq Documentation](https://github.com/sidekiq/sidekiq/wiki)
+   - [Sidekiq Github Repository](https://github.com/sidekiq/sidekiq)

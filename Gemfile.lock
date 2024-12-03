@@ -221,6 +221,10 @@ GEM
     rake (13.2.1)
     rdoc (6.8.1)
       psych (>= 4.0.0)
+    redis (5.3.0)
+      redis-client (>= 0.22.0)
+    redis-client (0.22.2)
+      connection_pool
     regexp_parser (2.9.2)
     reline (0.5.11)
       io-console (~> 0.5)
@@ -271,6 +275,11 @@ GEM
       rubocop-rails
     ruby-progressbar (1.13.0)
     securerandom (0.3.2)
+    sidekiq (7.3.6)
+      connection_pool (>= 2.3.0)
+      logger
+      rack (>= 2.2.4)
+      redis-client (>= 0.22.2)
     simplecov (0.22.0)
       docile (~> 1.1)
       simplecov-html (~> 0.11)
@@ -354,8 +363,10 @@ DEPENDENCIES
   kamal
   puma (>= 5.0)
   rails (~> 8.0.0)
+  redis
   rspec-rails (~> 7.1)
   rubocop-rails-omakase
+  sidekiq
   simplecov
   solid_cable
   solid_cache

@@ -1,5 +1,5 @@
 class NormalizeFileService
-  def self.process(file_path)
+  def self.process(file_path, upload_id)
     users = {}
 
     lines = File.readlines(file_path)
@@ -20,7 +20,7 @@ class NormalizeFileService
       end
 
       user = User.find_or_create_by(user_id: user_id, name: name)
-      order = user.orders.find_or_create_by(order_id: order_id, date: date)
+      order = user.orders.find_or_create_by(order_id: order_id, date: date, upload_id: upload_id)
       order.update!(total: order.total.to_f + value)
       order.products.create!(product_id: product_id, value: value)
 
@@ -28,6 +28,7 @@ class NormalizeFileService
       order = user[:orders][order_id] ||= { date: date, total: 0, products: [] }
       order[:total] += value
       order[:products] << { product_id: product_id, value: value }
+      order[:upload_id] = upload_id
     end
 
     format_response(users)
