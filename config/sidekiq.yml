@@ -1,0 +1,10 @@
+---
+:concurrency: 5
+
+:queues:
+  - default
+  - mailers
+  - critical
+  - low_priority
+
+:logfile: ./log/sidekiq.log

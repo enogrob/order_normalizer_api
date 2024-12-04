@@ -1,31 +1,34 @@
-# fly.toml app configuration file generated for order-normalizer-api on 2024-12-03T08:31:01-03:00
+# fly.toml app configuration file generated for order-normalizer-api on 2024-12-03T21:15:45-03:00
 #
 # See https://fly.io/docs/reference/configuration/ for information about how to use this file.
 #
 
 app = 'order-normalizer-api'
-primary_region = 'gru'
+primary_region = 'gig'
 console_command = '/rails/bin/rails console'
+
+[env]
+  REDIS_URL = 'redis://default:6e5b14ff08ca45428c0fe1a42c2cc486@fly-order-normalizer-api-redis.upstash.io:6379'
 
 [build]
 
-[env]
-  REDIS_URL="redis://default:eb878717ff7f43a284257a01671ce16b@fly-order-normalizer-api-redis.upstash.io:6379"
-
 [processes]
-  web = "bin/rails server"
-  worker = "bundle exec sidekiq"
+  app = 'bundle exec thrust ./bin/rails server'
+  sidekiq = 'bundle exec sidekiq'
+
+[[mounts]]
+  source = 'data'
+  destination = '/data'
 
 [http_service]
-  processes = ["web"] # this service only applies to the app process
   internal_port = 3000
   force_https = true
-  auto_stop_machines = true
+  auto_stop_machines = 'stop'
   auto_start_machines = true
   min_machines_running = 0
-
+  processes = ['app']
 
 [[vm]]
-  memory = '1gb'
+  memory = '2gb'
   cpu_kind = 'shared'
   cpus = 1

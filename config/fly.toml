@@ -1,0 +1,40 @@
+app = 'order-normalizer-api'
+
+kill_signal = "SIGINT"
+kill_timeout = 5
+
+[env]
+  RAILS_ENV = "production"
+" # Replace with the actual secret key
+  DATABASE_URL = "sqlite3:///data/production.sqlite3" # Fly's persistent volume for SQLite
+  REDIS_URL = 'redis://default:0aacf3a7764b49ed8dd8d2f4a5d6a719@fly-order-normalizer-api-redis.upstash.io:6379'
+  SIDEKIQ_CONCURRENCY = "5"
+
+[processes]
+  web = "bundle exec puma -C config/puma.rb"
+  worker = "bundle exec sidekiq -C config/sidekiq.yml"
+
+[[services]]
+  internal_port = 3000
+  protocol = "tcp"
+
+  [services.concurrency]
+    type = "connections"
+    soft_limit = 25
+    hard_limit = 50
+
+  [[services.ports]]
+    handlers = ["http"]
+    port = 80
+
+  [[services.ports]]
+    handlers = ["tls", "http"]
+    port = 443
+
+[[statics]]
+  guest_path = "/rails/public"
+  url_prefix = "/"
+
+[mounts]
+  source = "data"
+  destination = "/data"
